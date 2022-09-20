@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>WOLF log</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.js"></script>
+    <style type="text/css">
+        .chart {
+            min-width: 320px;
+            max-width: 800px;
+            height: 320px;
+            margin: 0 auto;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var chart;
+        //var list1  = [0,2,5,7,8,9,13,15,16,17,18,19,20,21,23,24,25,30,32,33,34,35,36,37]
+        var listE  = [2,7,13,17,18,33]
+        var listD  = [0,5,8,9,15,16,19,20,21,23,24,25,30,32,34,35,36,37]
+
+        $(function () {
+
+            function get_color(i){
+                if (i==2) return '#66FFB2';
+                if (i==7) return '#994c00';
+                if (i==13) return '#8B008B';
+                if (i==17) return '#FF0000';
+                if (i==18) return '#1E90FF';
+                if (i==33) return "#CCCC00";
+
+            }
+
+            function afterSetExtremes(e) {
+
+                //var chart = Highcharts.charts[0];
+                /*var ser1 = [];
+                 i = 0;
+
+                 chart.showLoading('Loading data from server...');
+                 //$.getJSON('https://www.highcharts.com/samples/data/from-sql.php?start=' + Math.round(e.min) +'&end=' + Math.round(e.max) + '&callback=?', function (data) {
+                 $.getJSON('http://localhost:8080/logint?d1='+ Math.round(e.min) +'&d2=' + Math.round(e.max), function (data) {
+                 //chartSummary[0].series[0].setData(data);
+                 for (i; i < data.length; i += 1) {
+                 var item = new Object();
+                 item.name = data[i].name; // the date
+                 item.data = data[i].data; // open
+                 item.tooltip = {valueDecimals: 0}
+
+                 if ($.inArray(i, list1) >= 0 ) {
+                 ser1.push(item)
+                 }
+                 }
+                 chart.series = ser1;
+                 chart.hideLoading();
+                 });*/
+            }
+
+
+            $.getJSON('http://localhost:8080/getData', function (data3) {
+                /*var list1  = [0,2,7,8]
+                 var list2  = [10]
+                 var list3  = [17,18,21,23,24,32,33,37,38]
+                 var listNe = [1,3,4,6,11,12,14,22,26,27,28,29,31,38]*/
+                var ser1 = [];
+                i = 0;
+
+                for (i; i < data3.length; i += 1) {
+                    var item = new Object();
+                    item.name = data3[i].name; // the date
+                    item.data = data3[i].data; // open
+                    item.tooltip = {valueDecimals: 0}
+
+                    if ($.inArray(i, listE) >= 0 ) {
+                        item.visible = true;
+                        item.color = get_color(i);
+                        ser1.push(item);
+                    }
+                    if ($.inArray(i, listD) >= 0 ) {
+                        item.visible = false;
+                        ser1.push(item);
+                    }
+                }
+
+                chart = new Highcharts.StockChart({
+                    chart: {
+                        renderTo: 'container1',
+                        defaultSeriesType: 'line',
+                        zoomType: 'x'
+                    },
+                    legend: {
+                        enabled: true
+                    },
+                    xAxis: {
+                        type: 'datetime',
+
+                        events: {
+                            afterSetExtremes: afterSetExtremes
+                            /*afterSetExtremes: function (event) {
+                             afterSetExtremes();
+                             //syncCharts(this.chart.container, event);
+                             } */
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'mesure 1'
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            point: {
+                                events: {
+                                    mouseOver: function () {
+                                        //syncTooltip(this.series.chart.container, this.x);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    series: ser1
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<div id="container1" class="widget" style="height:1000px"></div>
+</body>
+</html>
